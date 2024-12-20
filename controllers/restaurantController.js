@@ -34,8 +34,6 @@ exports.getRestaurantsByPostalCode = async (req, res, next) => {
 };
 
 
-
-
 exports.createRestaurant = async (req, res, next) => {
   try {
     const restaurant = new Restaurant(req.body);
