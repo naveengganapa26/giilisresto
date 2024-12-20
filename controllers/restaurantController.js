@@ -1,4 +1,4 @@
-const Restaurant = require('../models/Restaurant');
+const Restaurant = require("../models/Restaurant");
 
 exports.getAllRestaurants = async (req, res, next) => {
   try {
@@ -9,13 +9,32 @@ exports.getAllRestaurants = async (req, res, next) => {
   }
 };
 
-exports.getRestaurantById = async (req, res, next) => {
+// exports.getRestaurantById = async (req, res, next) => {
+//   try {
+//     const restaurant = await Restaurant.findById(req.params.id);
+//     if (!restaurant) {
+//       return res.status(404).json({ message: 'Restaurant not found' });
+//     }
+//     res.status(200).json(restaurant);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+exports.getRestaurantsByPostalCode = async (req, res, next) => {
   try {
-    const restaurant = await Restaurant.findById(req.params.id);
-    if (!restaurant) {
-      return res.status(404).json({ message: 'Restaurant not found' });
+    const { postalCode } = req.query;
+
+    if (!postalCode) {
+      return res.status(400).json({ message: "Postal code is required" });
     }
-    res.status(200).json(restaurant);
+    const restaurants = await Restaurant.find({ postalCode });
+    if (!restaurants || restaurants.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No restaurants found for the given postal code" });
+    }
+    res.status(200).json(restaurants);
   } catch (error) {
     next(error);
   }
@@ -39,7 +58,7 @@ exports.updateRestaurant = async (req, res, next) => {
       { new: true, runValidators: true }
     );
     if (!restaurant) {
-      return res.status(404).json({ message: 'Restaurant not found' });
+      return res.status(404).json({ message: "Restaurant not found" });
     }
     res.status(200).json(restaurant);
   } catch (error) {
@@ -51,7 +70,7 @@ exports.deleteRestaurant = async (req, res, next) => {
   try {
     const restaurant = await Restaurant.findByIdAndDelete(req.params.id);
     if (!restaurant) {
-      return res.status(404).json({ message: 'Restaurant not found' });
+      return res.status(404).json({ message: "Restaurant not found" });
     }
     res.status(204).send();
   } catch (error) {
