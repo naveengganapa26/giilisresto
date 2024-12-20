@@ -25,18 +25,47 @@ exports.getRestaurantsByPostalCode = async (req, res, next) => {
   try {
     const { postalCode } = req.query;
 
+    // Validate postal code
     if (!postalCode) {
-      return res.status(400).json({ message: "Postal code is required" });
+      return res.status(400).json({
+        success: false,
+        message: "Postal code is required"
+      });
     }
-    const restaurants = await Restaurant.find({ postalCode });
+
+    // Ensure proper format for postal code query
+    const formattedPostalCode = postalCode.trim();
+
+    // Query to find restaurants by postal code
+    const restaurants = await Restaurant.find({ 
+      postalCode: formattedPostalCode 
+    }).select('-__v'); // Exclude the version key
+
+    // Handle case when no restaurants are found
     if (!restaurants || restaurants.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No restaurants found for the given postal code" });
+      return res.status(404).json({
+        success: false,
+        message: `No restaurants found for postal code: ${formattedPostalCode}`
+      });
     }
-    res.status(200).json(restaurants);
+
+    // Return successful response with restaurants
+    return res.status(200).json({
+      success: true,
+      count: restaurants.length,
+      data: restaurants
+    });
+
   } catch (error) {
-    next(error);
+    // Log the error for debugging
+    console.error('Error fetching restaurants:', error);
+
+    // Return error response
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching restaurants",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 
