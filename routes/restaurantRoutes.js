@@ -10,7 +10,7 @@ const {
 const validateRestaurant = require('../middleware/validateRestaurant');
 
 router.get('/', getAllRestaurants);
-router.get('/:id', getRestaurantsByPostalCode);
+router.get('/:postalCode', getRestaurantsByPostalCode);
 router.post('/', validateRestaurant, createRestaurant);
 router.put('/:id', validateRestaurant, updateRestaurant);
 router.delete('/:id', deleteRestaurant);
