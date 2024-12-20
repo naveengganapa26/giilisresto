@@ -23,11 +23,32 @@ exports.getAllRestaurants = async (req, res, next) => {
 
 exports.getRestaurantsByPostalCode = async (req, res, next) => {
   try {
-    const restaurant = await Restaurant.findById(req.params.PostalCode);
-    if (!restaurant) {
-      return res.status(404).json({ message: 'Restaurant not found' });
+    // Use find() instead of findById() to search by postal code
+    const restaurants = await Restaurant.find({ 
+      postalCode: req.params.postalCode 
+    }).select({
+      name: 1,
+      offerPercentage: 1,
+      address: 1,
+      city: 1,
+      postalCode: 1,
+      imageUrl: 1,
+      rating: 1,
+      _id: 0  // Exclude the _id field from the response
+    });
+
+    if (!restaurants || restaurants.length === 0) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'No restaurants found for this postal code' 
+      });
     }
-    res.status(200).json(restaurant);
+
+    res.status(200).json({
+      success: true,
+      count: restaurants.length,
+      data: restaurants
+    });
   } catch (error) {
     next(error);
   }
