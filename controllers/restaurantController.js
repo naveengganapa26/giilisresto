@@ -23,22 +23,20 @@ exports.getAllRestaurants = async (req, res, next) => {
 
 exports.getRestaurantsByPostalCode = async (req, res, next) => {
   try {
-    const { postalCode } = req.query; // Extract postalCode from query parameters
+    const { postalCode } = req.query;
 
     if (!postalCode) {
       return res.status(400).json({ message: "Postal code is required" });
     }
-
-    // Filter restaurants by postalCode directly in the query
-    const restaurants = await Restaurant.find({ postalCode: postalCode });
-
+    const restaurants = await Restaurant.find({ postalCode });
     if (!restaurants || restaurants.length === 0) {
-      return res.status(404).json({ message: "No restaurants found for the given postal code" });
+      return res
+        .status(404)
+        .json({ message: "No restaurants found for the given postal code" });
     }
-
-    res.status(200).json(restaurants); // Respond with the filtered list of restaurants
+    res.status(200).json(restaurants);
   } catch (error) {
-    next(error); // Handle errors
+    next(error);
   }
 };
 
